@@ -1,0 +1,73 @@
+// Pin definitions
+#include <Servo.h>
+
+Servo myServo;  // Create a Servo object
+const int trigPin = 9;
+const int echoPin = 10;
+const int buzzerPin = 7;
+const int ledVerde = 6;
+const int buttonPin = 5;
+int pos=0;
+int x=1;
+int button=0;
+
+// Variables to store duration and distance
+long duration;
+float distance;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  myServo.attach(8);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(ledVerde, OUTPUT);
+  pinMode(button, INPUT);
+}
+
+void loop() {
+  
+  if(pos==180){
+    x=-10;
+  }
+  else if(pos==0){
+    x=10;
+  }
+  pos=pos+x;
+  Serial.print(pos);
+  Serial.print('\n');
+  myServo.write(pos);
+  delay(5);
+  // Clear the trigger pin
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  // Send a 10 microsecond HIGH pulse
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Read the duration of the echo pulse
+  duration = pulseIn(echoPin, HIGH);
+
+  // Calculate distance in cm
+  distance = duration * 0.034 / 2;
+
+  if(distance<20)
+  {
+    digitalWrite(buzzerPin, LOW);  // Turn buzzer ON                    // Buzz for 500 ms
+    digitalWrite(ledVerde, LOW);
+    
+  }else{
+    digitalWrite(buzzerPin, HIGH);
+    digitalWrite(ledVerde, HIGH);  // Turn buzzer OFF
+  }
+
+  // Output the result to the Serial Monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  delay(500);
+  
+}
